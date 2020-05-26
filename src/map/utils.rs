@@ -6,6 +6,8 @@ use crate::utils::read_file;
 use crate::Point;
 use std::path::Path;
 
+const DEFAULT_RAD: usize = 2;
+
 fn get_raw(txt: String) -> String {
     txt.lines()
         .map(|line| line.chars().into_iter().step_by(2).collect::<String>())
@@ -42,20 +44,6 @@ pub fn get_content(path: &Path) -> GameResult<(Content, usize)> {
     Ok((out, coins))
 }
 
-fn neighbours(tgt: Point) -> [Point; 8] {
-    let Point(x, y) = tgt;
-    [
-        Point(x - 1, y - 1),
-        Point(x, y - 1),
-        Point(x + 1, y - 1),
-        Point(x + 1, y),
-        Point(x + 1, y + 1),
-        Point(x, y + 1),
-        Point(x - 1, y + 1),
-        Point(x - 1, y),
-    ]
-}
-
 impl Map {
     pub(in crate::map) fn at_borders(&self, x: usize, y: usize) -> bool {
         y == 0 || y == self.content.len() || x == 0 || x == self.content[0].len()
@@ -67,11 +55,40 @@ impl Map {
     }
 
     pub(in crate::map) fn update(&mut self, pt: Point) {
-        let nb = neighbours(pt);
+        let nb = self.neighbours(pt, DEFAULT_RAD);
         for line in self.content.iter_mut() {
             for bloc in line.iter_mut() {
                 bloc.set_state(nb.contains(bloc.get_pos()));
             }
         }
+    }
+
+    pub(in crate::map) fn neighbours(&self, tgt: Point, rad: usize) -> Vec<Point> {
+        let width = self.content[0].len();
+        let height = self.content.len();
+
+        let Point(x, y) = tgt;
+        let mut out = Vec::new();
+
+        let from_y = if rad > y { 0 } else { y - rad };
+        let to_y = if y + rad + 1 >= height {
+            height
+        } else {
+            y + rad + 1
+        };
+        let from_x = if rad > x { 0 } else { x - rad };
+        let to_x = if x + rad + 1 >= width {
+            width
+        } else {
+            x + rad + 1
+        };
+
+        for i in from_y..to_y {
+            for j in from_x..to_x {
+                out.push(Point(j, i));
+            }
+        }
+
+        out
     }
 }

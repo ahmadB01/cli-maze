@@ -83,6 +83,6 @@ impl fmt::Display for Map {
             out.push(line.join(" "));
         }
 
-        write!(f, "{}", out.join("\n"))
+        write!(f, "{}\n{:?}", out.join("\n"), self.player.get_pos())
     }
 }
