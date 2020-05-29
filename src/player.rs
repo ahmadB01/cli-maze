@@ -2,13 +2,6 @@ use crate::Point;
 
 const SPAWN_POINT: Point = Point(1, 1);
 
-pub enum Direction {
-    Top,
-    Bottom,
-    Right,
-    Left,
-}
-
 #[derive(Debug)]
 pub struct Player {
     nick: String,

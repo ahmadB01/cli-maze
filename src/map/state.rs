@@ -1,5 +1,6 @@
 use crate::error::GameResult;
 use crate::map::utils::get_content;
+use crate::map::State;
 use crate::Point;
 use crossterm::event::KeyCode;
 use std::fmt;
@@ -7,7 +8,7 @@ use std::path::Path;
 use uuid::Uuid;
 
 use crate::map::Content;
-use crate::player::{Direction, Player};
+use crate::player::Player;
 
 #[derive(Debug)]
 pub struct Map {
@@ -15,6 +16,7 @@ pub struct Map {
     player: Player,
     pub(in crate::map) content: Content,
     coins: usize,
+    state: State,
 }
 
 impl Map {
@@ -28,18 +30,23 @@ impl Map {
             player,
             content,
             coins,
+            state: State::InGame,
         };
         out.update(spawn);
         Ok(out)
     }
 
-    pub fn with_name(self, name: String) -> Self {
-        Self {
-            name,
-            player: self.player,
-            content: self.content,
-            coins: self.coins,
-        }
+    pub fn with_name(&mut self, name: String) -> &Self {
+        self.name = name;
+        self
+    }
+
+    pub fn get_state(&self) -> &State {
+        &self.state
+    }
+
+    pub fn f_state(self) -> State {
+        self.state
     }
 
     pub fn get_content(&self) -> &Content {
@@ -48,7 +55,7 @@ impl Map {
 
     pub fn move_p(&mut self, to: KeyCode) {
         let Point(x, y) = self.player.get_pos().clone();
-        if self.at_borders(x, y) {
+        if self.is_overflow(Point(x, y), &to) {
             return;
         }
         let pt = match to {
@@ -58,7 +65,7 @@ impl Map {
             KeyCode::Left => Point(x - 1, y),
             _ => return,
         };
-        if self.reachable(pt) {
+        if self.is_reachable(pt) {
             self.player.set_pos(pt);
             self.update(pt);
         }
@@ -83,6 +90,6 @@ impl fmt::Display for Map {
             out.push(line.join(" "));
         }
 
-        write!(f, "{}\n{:?}", out.join("\n"), self.player.get_pos())
+        write!(f, "{}", out.join("\n"))
     }
 }

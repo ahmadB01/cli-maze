@@ -1,7 +1,4 @@
-use crate::bloc::{Bloc, BlocKind};
 use crate::error::{GameError, GameResult};
-use crate::map::Content;
-use crate::Point;
 use rand::seq::SliceRandom;
 use std::fs::{read_dir, DirEntry, OpenOptions};
 use std::io::{self, Read, Result};

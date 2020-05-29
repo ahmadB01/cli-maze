@@ -33,9 +33,10 @@ impl Bloc {
 impl fmt::Display for Bloc {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let c = match self.kind {
-            BlocKind::Air => ' ',
+            BlocKind::Air | BlocKind::Input => ' ',
             BlocKind::Wall => '#',
             BlocKind::Coin => '.',
+            BlocKind::Output => '_',
         };
         write!(f, "{}", if self.state { c } else { ' ' })
     }
@@ -46,4 +47,6 @@ pub enum BlocKind {
     Air,
     Wall,
     Coin,
+    Input,
+    Output,
 }

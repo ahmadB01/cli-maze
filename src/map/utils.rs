@@ -1,9 +1,9 @@
 use crate::bloc::{Bloc, BlocKind};
 use crate::error::{GameError, GameResult};
-use crate::map::Content;
-use crate::map::Map;
+use crate::map::{Content, Map};
 use crate::utils::read_file;
 use crate::Point;
+use crossterm::event::KeyCode;
 use std::path::Path;
 
 const DEFAULT_RAD: usize = 2;
@@ -17,27 +17,34 @@ fn get_raw(txt: String) -> String {
 
 pub fn get_content(path: &Path) -> GameResult<(Content, usize)> {
     let mut coins = 0usize;
+
     let txt = match read_file(path) {
         Ok(content) => content,
         Err(e) => return Err(GameError::IoError(Some(path.to_path_buf()), e)),
     };
+
     let raw = get_raw(txt);
     let mut out = Vec::new();
+
     for (y, l) in raw.lines().enumerate() {
         let mut line = Vec::new();
+
         for (x, c) in l.chars().enumerate() {
             let kind = match c {
-                '#' => BlocKind::Wall,
+                '#' | 'i' => BlocKind::Wall,
                 ' ' => BlocKind::Air,
                 '.' => {
                     coins += 1;
                     BlocKind::Coin
                 }
+                'o' => BlocKind::Output,
                 _ => return Err(GameError::InvalidMapFile(path.to_path_buf(), c)),
             };
+
             let bloc = Bloc::new(Point(x, y), kind);
             line.push(bloc);
         }
+
         out.push(line);
     }
 
@@ -45,13 +52,8 @@ pub fn get_content(path: &Path) -> GameResult<(Content, usize)> {
 }
 
 impl Map {
-    pub(in crate::map) fn at_borders(&self, x: usize, y: usize) -> bool {
-        y == 0 || y == self.content.len() || x == 0 || x == self.content[0].len()
-    }
-
-    pub(in crate::map) fn reachable(&self, pt: Point) -> bool {
-        let Point(x, y) = pt;
-        *self.content[y][x].get_type() != BlocKind::Wall
+    pub(in crate::map) fn is_reachable(&self, pt: Point) -> bool {
+        *self.at_pt(pt).get_type() != BlocKind::Wall
     }
 
     pub(in crate::map) fn update(&mut self, pt: Point) {
@@ -83,12 +85,30 @@ impl Map {
             x + rad + 1
         };
 
-        for i in from_y..to_y {
-            for j in from_x..to_x {
-                out.push(Point(j, i));
+        for j in from_y..to_y {
+            for i in from_x..to_x {
+                out.push(Point(i, j));
             }
         }
 
         out
+    }
+
+    pub(in crate::map) fn at_pt(&self, pt: Point) -> &Bloc {
+        &self.content[pt.1][pt.0]
+    }
+
+    pub(in crate::map) fn is_overflow(&self, pt: Point, to: &KeyCode) -> bool {
+        // i must make a `size` field to my Map struct
+        let max_x = self.content[0].len() - 1;
+        let max_y = self.content.len() - 1;
+
+        // didnt find another way to make that
+        match (pt, to) {
+            (Point(0, _), KeyCode::Left) | (Point(_, 0), KeyCode::Up) => true,
+            (Point(x, _), KeyCode::Right) if x == max_x => true,
+            (Point(_, y), KeyCode::Down) if y == max_y => true,
+            _ => false,
+        }
     }
 }

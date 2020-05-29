@@ -1,5 +1,6 @@
 use std::convert::From;
 use std::fmt;
+use std::io;
 use std::path::PathBuf;
 
 pub type GameResult<T> = Result<T, GameError>;
@@ -41,5 +42,11 @@ impl fmt::Debug for GameError {
 impl From<crossterm::ErrorKind> for GameError {
     fn from(e: crossterm::ErrorKind) -> Self {
         GameError::TerminalError(e)
+    }
+}
+
+impl From<io::Error> for GameError {
+    fn from(e: io::Error) -> Self {
+        GameError::IoError(None, e)
     }
 }
