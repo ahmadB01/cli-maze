@@ -1,11 +1,11 @@
 use crate::error::GameResult;
 use crate::map::utils::get_content;
 use crate::map::State;
+use crate::utils::unknown_name;
 use crate::Point;
 use crossterm::event::KeyCode;
 use std::fmt;
 use std::path::Path;
-use uuid::Uuid;
 
 use crate::map::Content;
 use crate::player::Player;
@@ -17,26 +17,26 @@ pub struct Map {
     pub(in crate::map) content: Content,
     coins: usize,
     state: State,
+    pub(in crate::map) size: (usize, usize),
 }
 
 impl Map {
-    pub fn new(player: Player, path: &Path) -> GameResult<Self> {
-        let (content, coins) = get_content(path)?;
-        let id = Uuid::new_v4();
-        let init_name = format!("unknown: {}", id);
-        let spawn = player.get_pos().clone();
+    pub fn new(path: &Path) -> GameResult<Self> {
+        let (content, coins, spawn) = get_content(path)?;
+        let (width, height) = (content[0].len(), content.len());
         let mut out = Self {
-            name: init_name,
-            player,
+            name: unknown_name(),
+            player: Player::at(spawn)?,
             content,
             coins,
             state: State::InGame,
+            size: (width, height),
         };
-        out.update(spawn);
+        out.update(*out.player.get_pos());
         Ok(out)
     }
 
-    pub fn with_name(&mut self, name: String) -> &Self {
+    pub fn with_name(mut self, name: String) -> Self {
         self.name = name;
         self
     }
@@ -54,8 +54,8 @@ impl Map {
     }
 
     pub fn move_p(&mut self, to: KeyCode) {
-        let Point(x, y) = self.player.get_pos().clone();
-        if self.is_overflow(Point(x, y), &to) {
+        let Point(x, y) = *self.player.get_pos();
+        if self.is_overflow(Point(x, y), to) {
             return;
         }
         let pt = match to {
@@ -83,7 +83,7 @@ impl fmt::Display for Map {
                     if x == self.player.get_pos().0 && y == self.player.get_pos().1 {
                         String::from("O")
                     } else {
-                        self.content[y][x].to_string()
+                        self.at_pt(x, y).to_string()
                     },
                 );
             }

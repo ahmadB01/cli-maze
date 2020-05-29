@@ -3,6 +3,7 @@ use rand::seq::SliceRandom;
 use std::fs::{read_dir, DirEntry, OpenOptions};
 use std::io::{self, Read, Result};
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 pub fn read_file(path: &Path) -> io::Result<String> {
     let mut file = OpenOptions::new().read(true).open(path)?;
@@ -24,4 +25,9 @@ pub fn random_map(path: &Path) -> GameResult<PathBuf> {
         .ok_or(GameError::NoMapFound(path.to_path_buf()))?;
 
     Ok(file.path())
+}
+
+pub fn unknown_name() -> String {
+    let id = Uuid::new_v4();
+    format!("unknown: {}", id)
 }
