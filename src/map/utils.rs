@@ -6,8 +6,6 @@ use crate::Point;
 use crossterm::event::KeyCode;
 use std::path::Path;
 
-const DEFAULT_RAD: usize = 2;
-
 fn get_raw(txt: String) -> String {
     txt.lines()
         .map(|line| line.chars().step_by(2).collect::<String>())
@@ -63,15 +61,6 @@ impl Map {
         *self.at_pt(x, y).get_type() != BlocKind::Wall
     }
 
-    pub(in crate::map) fn update(&mut self, pt: Point) {
-        let nb = self.neighbours(pt, DEFAULT_RAD);
-        for line in self.content.iter_mut() {
-            for bloc in line.iter_mut() {
-                bloc.set_state(nb.contains(bloc.get_pos()));
-            }
-        }
-    }
-
     pub(in crate::map) fn neighbours(&self, tgt: Point, rad: usize) -> Vec<Point> {
         let (width, height) = self.size;
 
@@ -102,6 +91,13 @@ impl Map {
 
     pub(in crate::map) fn at_pt(&self, x: usize, y: usize) -> &Bloc {
         &self.content[y][x]
+    }
+
+    pub(in crate::map) fn at_pt_mut(&mut self, x: usize, y: usize) -> &mut Bloc {
+        self.content
+            .get_mut(y)
+            .and_then(|line| line.get_mut(x))
+            .unwrap()
     }
 
     pub(in crate::map) fn is_overflow(&self, pt: Point, to: KeyCode) -> bool {

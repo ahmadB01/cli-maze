@@ -1,3 +1,4 @@
+use crate::bloc::BlocKind;
 use crate::error::GameResult;
 use crate::map::utils::get_content;
 use crate::map::State;
@@ -9,6 +10,8 @@ use std::path::Path;
 
 use crate::map::Content;
 use crate::player::Player;
+
+const DEFAULT_RAD: usize = 2;
 
 #[derive(Debug)]
 pub struct Map {
@@ -70,6 +73,33 @@ impl Map {
             self.update(pt);
         }
     }
+
+    fn finish(&mut self) {
+        if self.player.get_pts() == self.coins {
+            self.state = State::Win;
+        } else {
+            self.state = State::Loose;
+        }
+    }
+
+    fn update(&mut self, pt: Point) {
+        let current = self.at_pt(pt.0, pt.1);
+        match current.get_type() {
+            BlocKind::Coin => {
+                let current = self.at_pt_mut(pt.0, pt.1);
+                current.set_type(BlocKind::Air);
+                self.player.plus1();
+            }
+            BlocKind::Output => self.finish(),
+            _ => (),
+        }
+        let nb = self.neighbours(pt, DEFAULT_RAD);
+        for line in self.content.iter_mut() {
+            for bloc in line.iter_mut() {
+                bloc.set_state(nb.contains(bloc.get_pos()));
+            }
+        }
+    }
 }
 
 impl fmt::Display for Map {
@@ -90,6 +120,13 @@ impl fmt::Display for Map {
             out.push(line.join(" "));
         }
 
-        write!(f, "{}", out.join("\n"))
+        write!(
+            f,
+            "Map: {}\n{}\nPlayer: {}\nPoints: {}",
+            self.name,
+            out.join("\n"),
+            self.player.get_nick(),
+            self.player.get_pts()
+        )
     }
 }

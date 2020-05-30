@@ -47,6 +47,14 @@ impl Player {
         self
     }
 
+    pub fn get_nick(&self) -> &String {
+        &self.nick
+    }
+
+    pub fn plus1(&mut self) {
+        self.score += 1
+    }
+
     pub fn get_pts(&self) -> usize {
         self.score
     }

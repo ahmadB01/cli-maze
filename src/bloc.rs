@@ -25,6 +25,10 @@ impl Bloc {
         &self.kind
     }
 
+    pub fn set_type(&mut self, t: BlocKind) {
+        self.kind = t;
+    }
+
     pub fn get_pos(&self) -> &Point {
         &self.pos
     }
@@ -33,10 +37,9 @@ impl Bloc {
 impl fmt::Display for Bloc {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let c = match self.kind {
-            BlocKind::Air | BlocKind::Input => ' ',
+            BlocKind::Air | BlocKind::Output => ' ',
             BlocKind::Wall => '#',
             BlocKind::Coin => '.',
-            BlocKind::Output => '_',
         };
         write!(f, "{}", if self.state { c } else { ' ' })
     }
@@ -47,6 +50,5 @@ pub enum BlocKind {
     Air,
     Wall,
     Coin,
-    Input,
     Output,
 }

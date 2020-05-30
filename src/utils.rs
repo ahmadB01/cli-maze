@@ -29,5 +29,5 @@ pub fn random_map(path: &Path) -> GameResult<PathBuf> {
 
 pub fn unknown_name() -> String {
     let id = Uuid::new_v4();
-    format!("unknown: {}", id)
+    format!("unknown {}", id)
 }
