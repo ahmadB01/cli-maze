@@ -1,12 +1,11 @@
 use crate::error::GameResult;
 use crate::utils::unknown_name;
 use crate::Point;
+use std::io::{stdin, stdout, Write};
 
 const SPAWN_POINT: Point = Point(1, 1);
 
 fn ask_nick() -> GameResult<String> {
-    use std::io::{stdin, stdout, Write};
-
     print!(">>> Enter your nick: ");
     stdout().flush()?;
 
@@ -14,10 +13,8 @@ fn ask_nick() -> GameResult<String> {
     stdin().read_line(&mut out)?;
 
     if out.is_empty() || out.contains(' ') {
-        println!("Come on that's not funny.");
         Ok(unknown_name())
     } else {
-        println!("Ok {}.", out);
         Ok(out)
     }
 }
@@ -31,13 +28,9 @@ pub struct Player {
 
 impl Player {
     pub fn at(spawn: Option<Point>) -> GameResult<Self> {
-        let spawn = match spawn {
-            Some(p) => p,
-            None => SPAWN_POINT,
-        };
         Ok(Self {
             nick: ask_nick()?,
-            pos: spawn,
+            pos: spawn.unwrap_or(SPAWN_POINT),
             score: 0,
         })
     }

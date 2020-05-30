@@ -22,7 +22,7 @@ pub fn random_map(path: &Path) -> GameResult<PathBuf> {
 
     let file = files
         .choose(&mut rng)
-        .ok_or(GameError::NoMapFound(path.to_path_buf()))?;
+        .ok_or_else(|| GameError::NoMapFound(path.to_path_buf()))?;
 
     Ok(file.path())
 }
@@ -30,4 +30,8 @@ pub fn random_map(path: &Path) -> GameResult<PathBuf> {
 pub fn unknown_name() -> String {
     let id = Uuid::new_v4();
     format!("unknown {}", id)
+}
+
+pub fn map_name(path: PathBuf) -> String {
+    String::from(path.file_stem().unwrap().to_str().unwrap())
 }
