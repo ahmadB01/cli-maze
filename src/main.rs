@@ -1,39 +1,48 @@
+use std::io::{stdin, stdout, Write};
+
 use cli_maze::error::GameResult;
-use cli_maze::map::{Map, State};
-use cli_maze::utils::{map_name, random_map};
-use crossterm::event::{read, Event};
-use std::path::Path;
+use cli_maze::game::{Menu, Mode};
+use cli_maze::utils::clear;
+// the cli_maze::game::mode::Menu macro
+// so it cannot be confused with the cli_maze::game::main_menu::Menu struct
+use cli_maze::Menu;
 
-const MAPS_PATH: &str = "./maps/";
-
-fn g_loop(mut game: Map) -> GameResult<State> {
-    loop {
-        clear();
-        println!("{}", game);
-        if let Event::Key(e) = read()? {
-            game.move_p(e.code);
-        }
-        match game.get_state() {
-            State::InGame => continue,
-            _ => break Ok(game.f_state()),
-        }
-    }
+fn play() {
+    println!("OK LETS PLAY XD");
 }
 
-fn clear() {
-    print!("\x1b[2J\x1b[1;1H");
+fn add_map() {
+    println!("ok you want to add a new map");
+}
+
+fn del_map() {
+    println!("ok you want to delete a map");
 }
 
 fn main() -> GameResult<()> {
-    let path = random_map(Path::new(MAPS_PATH))?;
-    let game = Map::new(path.as_path())?.with_name(map_name(path));
-    let f_state = g_loop(game)?;
+    let menu = Menu!(
+        ("Play", Play, play),
+        ("Add a map", AddMap, add_map),
+        ("Remove a map", DelMap, del_map)
+    );
 
-    if let State::Win = f_state {
-        println!("youpi");
-    } else {
-        println!("t nul");
+    print!("{}{}", clear(), menu);
+
+    let stdin = stdin();
+    let mut stdout = stdout();
+
+    loop {
+        print!(">>> ");
+        stdout.flush()?;
+        let mut out = String::new();
+        stdin.read_line(&mut out)?;
+        match menu.perform(out) {
+            Ok(_) => break,
+            Err(_) => continue,
+        }
     }
+
+    println!("yallah bye");
 
     Ok(())
 }

@@ -35,3 +35,9 @@ pub fn unknown_name() -> String {
 pub fn map_name(path: PathBuf) -> String {
     String::from(path.file_stem().unwrap().to_str().unwrap())
 }
+
+pub fn clear() -> &'static str {
+    "\x1b[2J\x1b[1;1H\
+     CLI-MAZE\n\
+     --------\n"
+}

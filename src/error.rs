@@ -1,11 +1,12 @@
-use std::convert::From;
 use std::fmt;
 use std::io;
+use std::num::ParseIntError;
 use std::path::PathBuf;
 
 pub type GameResult<T> = Result<T, GameError>;
 
 pub enum GameError {
+    IncorrectInput,
     TerminalError(crossterm::ErrorKind),
     IoError(Option<PathBuf>, std::io::Error),
     InvalidMapFile(PathBuf, char),
@@ -17,6 +18,7 @@ pub enum GameError {
 impl fmt::Debug for GameError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let c = match self {
+            GameError::IncorrectInput => String::from("This input is incorrect"),
             GameError::TerminalError(e) => format!("Unexpected terminal error: {}", e.to_string()),
             GameError::IoError(path, e) => {
                 let mut output = format!("Unexpected IO Error: {}", e.to_string());
@@ -48,5 +50,11 @@ impl From<crossterm::ErrorKind> for GameError {
 impl From<io::Error> for GameError {
     fn from(e: io::Error) -> Self {
         GameError::IoError(None, e)
+    }
+}
+
+impl From<ParseIntError> for GameError {
+    fn from(_: ParseIntError) -> Self {
+        GameError::IncorrectInput
     }
 }
