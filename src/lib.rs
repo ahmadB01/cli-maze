@@ -6,6 +6,7 @@ pub mod player;
 pub mod utils;
 
 pub use error::GameResult;
+pub use game::handler::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point(usize, usize);

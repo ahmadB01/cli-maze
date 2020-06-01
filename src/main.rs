@@ -1,30 +1,17 @@
+use cli_maze::play;
+
 use std::io::{stdin, stdout, Write};
 
-use cli_maze::error::GameResult;
 use cli_maze::game::{Menu, Mode};
 use cli_maze::utils::clear;
-// the cli_maze::game::mode::Menu macro
-// so it cannot be confused with the cli_maze::game::main_menu::Menu struct
-use cli_maze::Menu;
-
-fn play() {
-    println!("OK LETS PLAY XD");
-}
-
-fn add_map() {
-    println!("ok you want to add a new map");
-}
-
-fn del_map() {
-    println!("ok you want to delete a map");
-}
+// the Menu! macro, it cannot be confused by the compiler
+// with the Menu struct
+use cli_maze::{GameResult, Menu};
 
 fn main() -> GameResult<()> {
-    let menu = Menu!(
-        ("Play", Play, play),
-        ("Add a map", AddMap, add_map),
-        ("Remove a map", DelMap, del_map)
-    );
+    // i will integrate more modes in the future
+    // see cli-maze/game/handler :D
+    let menu = Menu!(("Play", Play, play::run));
 
     print!("{}{}", clear(), menu);
 
@@ -38,11 +25,13 @@ fn main() -> GameResult<()> {
         stdin.read_line(&mut out)?;
         match menu.perform(out) {
             Ok(_) => break,
-            Err(_) => continue,
+            Err(e) => {
+                println!("{:?}", e);
+                continue;
+            }
         }
     }
 
-    println!("yallah bye");
-
+    println!("Goodbye");
     Ok(())
 }

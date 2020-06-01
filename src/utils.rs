@@ -37,7 +37,8 @@ pub fn map_name(path: PathBuf) -> String {
 }
 
 pub fn clear() -> &'static str {
+    // we cant center a text with ms-dos :'(
     "\x1b[2J\x1b[1;1H\
      CLI-MAZE\n\
-     --------\n"
+     ----------------------------\n"
 }

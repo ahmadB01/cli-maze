@@ -1,13 +1,15 @@
+use crate::GameResult;
+
 #[macro_export]
 macro_rules! Menu {
-    ($(($disp:literal, $mode:ident, $perf:expr)),+) => {{
+    ($(($disp:literal, $Mode:ident, $perf:expr)),+) => {{
         let mut m: Menu = Default::default();
         $(
-            struct $mode;
+            struct $Mode;
 
-            impl<'a> Mode<'a> for $mode {
-                fn perform(&self) {
-                    $perf();
+            impl<'a> Mode<'a> for $Mode {
+                fn perform(&self) -> GameResult<()> {
+                    $perf()
                 }
 
                 fn desc(&self) -> &'a str {
@@ -15,7 +17,7 @@ macro_rules! Menu {
                 }
             };
 
-            m.new_mode(&$mode);
+            m.new_mode(&$Mode);
         )+;
 
         m
@@ -23,6 +25,6 @@ macro_rules! Menu {
 }
 
 pub trait Mode<'a> {
-    fn perform(&self);
+    fn perform(&self) -> GameResult<()>;
     fn desc(&self) -> &'a str;
 }

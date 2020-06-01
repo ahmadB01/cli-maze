@@ -6,16 +6,16 @@ use std::io::{stdin, stdout, Write};
 const SPAWN_POINT: Point = Point(1, 1);
 
 fn ask_nick() -> GameResult<String> {
-    print!(">>> Enter your nick: ");
+    print!("Enter your nick: ");
     stdout().flush()?;
 
     let mut out = String::new();
     stdin().read_line(&mut out)?;
 
-    if out.is_empty() || out.contains(' ') {
+    if out.trim().is_empty() || out.contains(' ') {
         Ok(unknown_name())
     } else {
-        Ok(out)
+        Ok(out.trim().to_owned())
     }
 }
 

@@ -17,7 +17,7 @@ impl<'a> Menu<'a> {
         self.modes
             .get(i - 1)
             .ok_or(GameError::IncorrectInput)?
-            .perform();
+            .perform()?;
         Ok(())
     }
 }

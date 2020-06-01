@@ -122,9 +122,13 @@ impl fmt::Display for Map {
 
         write!(
             f,
-            "Map: {}\n{}\nPlayer: {}\nPoints: {}",
+            "Map: {}\n\
+             {}\n\
+             Points to get: {}\n\
+             {}'s points: {}",
             self.name,
             out.join("\n"),
+            self.coins,
             self.player.get_nick(),
             self.player.get_pts()
         )
