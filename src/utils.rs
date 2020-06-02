@@ -12,13 +12,16 @@ pub fn read_file(path: &Path) -> io::Result<String> {
     Ok(out)
 }
 
-pub fn random_map(path: &Path) -> GameResult<PathBuf> {
-    let mut rng = rand::thread_rng();
-
-    let files = read_dir(path)
+pub fn maps_list(path: &Path) -> GameResult<Vec<DirEntry>> {
+    read_dir(path)
         .map_err(|_| GameError::MapsDirNotFound(path.to_path_buf()))?
         .collect::<Result<Vec<DirEntry>>>()
-        .map_err(|e| GameError::IoError(Some(path.to_path_buf()), e))?;
+        .map_err(|e| GameError::IoError(Some(path.to_path_buf()), e))
+}
+
+pub fn random_map(path: &Path) -> GameResult<PathBuf> {
+    let mut rng = rand::thread_rng();
+    let files = maps_list(path)?;
 
     let file = files
         .choose(&mut rng)

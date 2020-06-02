@@ -1,15 +1,12 @@
 use crate::map::{Map, State};
 use crate::utils::{clear, map_name, random_map};
-use crate::GameResult;
+use crate::{GameResult, MAPS_PATH};
 use crossterm::event::{read, Event};
 use std::path::Path;
 
-const MAPS_PATH: &str = "./maps/";
-
 fn g_loop(mut game: Map) -> GameResult<State> {
     loop {
-        print!("{}", clear());
-        println!("{}", game);
+        println!("{}{}", clear(), game);
         if let Event::Key(e) = read()? {
             game.move_p(e.code);
         }

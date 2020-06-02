@@ -4,11 +4,11 @@ use std::fmt;
 
 #[derive(Default)]
 pub struct Menu<'a> {
-    modes: Vec<&'a dyn Mode<'a>>,
+    modes: Vec<&'a dyn Mode>,
 }
 
 impl<'a> Menu<'a> {
-    pub fn new_mode(&mut self, mode: &'a dyn Mode<'a>) {
+    pub fn new_mode(&mut self, mode: &'a dyn Mode) {
         self.modes.push(mode);
     }
 
