@@ -1,9 +1,6 @@
-use crate::bloc::BlocKind;
 use crate::error::GameResult;
 use crate::map::utils::get_content;
-use crate::map::Content;
-use crate::map::State;
-use crate::player::Player;
+use crate::map::{bloc::BlocKind, Content, Player, State};
 use crate::utils::unknown_name;
 use crate::Point;
 
@@ -47,10 +44,6 @@ impl Map {
 
     pub fn get_state(&self) -> &State {
         &self.state
-    }
-
-    pub fn f_state(self) -> State {
-        self.state
     }
 
     pub fn get_content(&self) -> &Content {
@@ -133,5 +126,17 @@ impl fmt::Display for Map {
             self.player.get_nick(),
             self.player.get_pts()
         )
+    }
+}
+
+impl Drop for Map {
+    fn drop(&mut self) {
+        let nick = self.player.get_nick();
+        let coins = self.player.get_pts();
+        if let State::Win = self.state {
+            println!("Player {} won! {} points given to him!", nick, coins);
+        } else if let State::Loose = self.state {
+            println!("Player {} loose! {} coins remaining.", nick, coins);
+        }
     }
 }

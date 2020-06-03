@@ -13,7 +13,11 @@ fn rename_to(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<PathBuf> {
 
 pub fn run(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
     disp_list()?;
-    let map_path = ask_map(stdin, stdout)?;
+    let map_path = ask_map(
+        "Choose the map to rename by giving an index: ",
+        stdin,
+        stdout,
+    )?;
     let to = rename_to(stdin, stdout)?;
 
     if is_sure(stdin, stdout)? {

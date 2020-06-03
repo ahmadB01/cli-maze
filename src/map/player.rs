@@ -36,11 +36,6 @@ impl Player {
         })
     }
 
-    pub fn with_nick(mut self, nick: String) -> Self {
-        self.nick = nick;
-        self
-    }
-
     pub fn get_nick(&self) -> &String {
         &self.nick
     }

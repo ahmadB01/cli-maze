@@ -7,7 +7,11 @@ use std::io::{Stdin, Stdout};
 pub fn run(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
     disp_list()?;
     println!("--- Deleting a map ---\n");
-    let map_path = ask_map(stdin, stdout)?;
+    let map_path = ask_map(
+        "Choose the map to remove by giving an index: ",
+        stdin,
+        stdout,
+    )?;
 
     if is_sure(stdin, stdout)? {
         remove_file(map_path)?;

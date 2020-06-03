@@ -1,5 +1,5 @@
-use crate::bloc::{Bloc, BlocKind};
 use crate::error::{GameError, GameResult};
+use crate::map::bloc::{Bloc, BlocKind};
 use crate::map::{Content, Map};
 use crate::utils::read_file;
 use crate::Point;
@@ -13,6 +13,7 @@ fn get_raw(txt: String) -> String {
         .join("\n")
 }
 
+// TODO: shrink this function
 pub fn get_content(path: &Path) -> GameResult<(Content, usize, Option<Point>)> {
     let mut coins = 0usize;
 

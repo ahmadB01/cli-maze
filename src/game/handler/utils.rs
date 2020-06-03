@@ -23,10 +23,10 @@ pub fn disp_list() -> GameResult<()> {
     Ok(())
 }
 
-pub fn ask_map(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<PathBuf> {
+pub fn ask_map(ask: &str, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<PathBuf> {
     let maps = maps_list(Path::new(MAPS_PATH))?;
     loop {
-        print!("Choose the map to remove by giving an index: ");
+        print!("{}", ask);
         stdout.flush()?;
         let mut out = String::new();
         stdin.read_line(&mut out)?;
