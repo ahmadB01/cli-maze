@@ -1,6 +1,8 @@
 use crate::error::{GameError, GameResult};
 use crate::game::mode::Mode;
+
 use std::fmt;
+use std::io::{Stdin, Stdout};
 
 #[derive(Default)]
 pub struct Menu<'a> {
@@ -12,12 +14,12 @@ impl<'a> Menu<'a> {
         self.modes.push(mode);
     }
 
-    pub fn perform(&self, i: String) -> GameResult<()> {
+    pub fn perform(&self, i: String, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
         let i = i.trim().parse::<usize>()?;
         self.modes
             .get(i - 1)
             .ok_or(GameError::IncorrectInput)?
-            .perform()?;
+            .perform(stdin, stdout)?;
         Ok(())
     }
 }

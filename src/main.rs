@@ -1,8 +1,8 @@
-use cli_maze::{add_map, del_map, exit, play};
+use cli_maze::{add_map, del_map, exit, play, ren_map};
 
 use cli_maze::game::{Menu, Mode};
 use cli_maze::utils::clear;
-use std::io::{stdin, stdout, Write};
+use std::io::{stdin, stdout, Stdin, Stdout, Write};
 // the Menu! macro, it cannot be confused by the compiler
 // with the Menu struct
 use cli_maze::{GameResult, Menu};
@@ -17,32 +17,37 @@ fn menu() -> Menu<'static> {
         AddMap,
         #[field(display = "Remove a map", perform = del_map::run)]
         DelMap,
+        #[field(display = "Rename a map", perform = ren_map::run)]
+        RenMap,
         #[field(display = "Exit game", perform = exit::run)]
         Exit,
     ]
 }
 
+fn menu_loop(menu: &Menu, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
+    loop {
+        print!(">>> ");
+        stdout.flush()?;
+        let mut out = String::new();
+        stdin.read_line(&mut out)?;
+        match menu.perform(out, stdin, stdout) {
+            Ok(_) => break Ok(()),
+            Err(e) => {
+                println!("{:?}", e);
+                continue;
+            }
+        }
+    }
+}
+
 fn main() -> GameResult<()> {
     let menu = menu();
 
+    let stdin = stdin();
+    let mut stdout = stdout();
+
     loop {
         print!("{}{}", clear(), menu);
-
-        let stdin = stdin();
-        let mut stdout = stdout();
-
-        loop {
-            print!(">>> ");
-            stdout.flush()?;
-            let mut out = String::new();
-            stdin.read_line(&mut out)?;
-            match menu.perform(out) {
-                Ok(_) => break,
-                Err(e) => {
-                    println!("{:?}", e);
-                    continue;
-                }
-            }
-        }
+        menu_loop(&menu, &stdin, &mut stdout)?;
     }
 }

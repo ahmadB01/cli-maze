@@ -1,7 +1,9 @@
 use crate::map::{Map, State};
 use crate::utils::{clear, map_name, random_map};
 use crate::{GameResult, MAPS_PATH};
+
 use crossterm::event::{read, Event};
+use std::io::{Stdin, Stdout};
 use std::path::Path;
 
 fn g_loop(mut game: Map) -> GameResult<State> {
@@ -17,9 +19,9 @@ fn g_loop(mut game: Map) -> GameResult<State> {
     }
 }
 
-pub fn run() -> GameResult<()> {
+pub fn run(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
     let path = random_map(Path::new(MAPS_PATH))?;
-    let game = Map::new(path.as_path())?.with_name(map_name(path));
+    let game = Map::new(path.as_path(), stdin, stdout)?.with_name(map_name(path));
     let f_state = g_loop(game)?;
 
     if let State::Win = f_state {

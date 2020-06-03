@@ -1,4 +1,5 @@
 use crate::GameResult;
+use std::io::{Stdin, Stdout};
 
 #[macro_export]
 macro_rules! Menu {
@@ -12,8 +13,8 @@ macro_rules! Menu {
             struct $mode;
 
             impl Mode for $mode {
-                fn perform(&self) -> GameResult<()> {
-                    $perf()
+                fn perform(&self, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
+                    $perf(stdin, stdout)
                 }
 
                 fn desc(&self) -> &'static str {
@@ -29,6 +30,6 @@ macro_rules! Menu {
 }
 
 pub trait Mode {
-    fn perform(&self) -> GameResult<()>;
+    fn perform(&self, stdin: &Stdin, stout: &mut Stdout) -> GameResult<()>;
     fn desc(&self) -> &'static str;
 }

@@ -1,15 +1,16 @@
 use crate::bloc::BlocKind;
 use crate::error::GameResult;
 use crate::map::utils::get_content;
+use crate::map::Content;
 use crate::map::State;
+use crate::player::Player;
 use crate::utils::unknown_name;
 use crate::Point;
+
 use crossterm::event::KeyCode;
 use std::fmt;
+use std::io::{Stdin, Stdout};
 use std::path::Path;
-
-use crate::map::Content;
-use crate::player::Player;
 
 const DEFAULT_RAD: usize = 2;
 
@@ -24,12 +25,12 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn new(path: &Path) -> GameResult<Self> {
+    pub fn new(path: &Path, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<Self> {
         let (content, coins, spawn) = get_content(path)?;
         let (width, height) = (content[0].len(), content.len());
         let mut out = Self {
             name: unknown_name(),
-            player: Player::at(spawn)?,
+            player: Player::new(spawn, stdin, stdout)?,
             content,
             coins,
             state: State::InGame,
