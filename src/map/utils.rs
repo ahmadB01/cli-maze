@@ -3,7 +3,10 @@ use crate::map::bloc::{Bloc, BlocKind};
 use crate::map::{Content, Map};
 use crate::utils::read_file;
 use crate::Point;
+
 use crossterm::event::KeyCode;
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::Path;
 
 fn get_raw(txt: String) -> String {
@@ -113,4 +116,10 @@ impl Map {
             _ => false,
         }
     }
+}
+
+pub fn append_data(raw: String, path: &str) -> GameResult<()> {
+    let mut file = OpenOptions::new().append(true).create(true).open(path)?;
+    file.write_all(raw.as_bytes())?;
+    Ok(())
 }

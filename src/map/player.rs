@@ -1,6 +1,9 @@
 use crate::error::GameResult;
+use crate::map::utils::append_data;
 use crate::utils::unknown_name;
 use crate::Point;
+
+const SCORES_PATH: &str = "./scores";
 
 use std::io::{Stdin, Stdout, Write};
 
@@ -54,5 +57,12 @@ impl Player {
 
     pub fn set_pos(&mut self, new: Point) {
         self.pos = new;
+    }
+}
+
+impl Drop for Player {
+    fn drop(&mut self) {
+        let raw = format!("{}={};", self.nick, self.score);
+        append_data(raw, SCORES_PATH).unwrap();
     }
 }
