@@ -7,18 +7,12 @@ use std::path::{Path, PathBuf};
 
 pub fn disp_list() -> GameResult<()> {
     let full = canonicalize(MAPS_PATH)?;
-
-    let maps = maps_list(full.as_path())?
-        .iter()
-        .enumerate()
-        .map(|(i, file)| {
-            let name = map_name(file.path());
-            format!("{} - {}\n", i + 1, name)
-        })
-        .collect::<String>();
-
     println!("{}Path: {:?}:", clear(), full);
-    println!("{}", maps);
+
+    for (i, file) in maps_list(full.as_path())?.iter().enumerate() {
+        let name = map_name(&file.path())?;
+        println!("{} - {}", i + 1, name);
+    }
 
     Ok(())
 }
@@ -43,23 +37,11 @@ pub fn ask_map(ask: &str, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<Path
     }
 }
 
-pub fn is_sure(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<bool> {
+pub fn is_sure(ask: String, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<bool> {
+    println!("{}", ask);
     print!("Are you sure? (\"yes\"/\"no\"): ");
     stdout.flush()?;
     let mut out = String::new();
     stdin.read_line(&mut out)?;
     Ok(out.trim() == "yes")
-}
-
-pub fn ask_name(ask: &str, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<String> {
-    loop {
-        let mut out = String::new();
-        print!("{}", ask);
-        stdout.flush()?;
-        stdin.read_line(&mut out)?;
-        let out = out.trim().to_owned();
-        if !(out.is_empty() || out.contains(' ')) {
-            break Ok(out);
-        }
-    }
 }

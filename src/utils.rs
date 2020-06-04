@@ -1,11 +1,12 @@
 use crate::error::{GameError, GameResult};
+
 use rand::seq::SliceRandom;
 use std::fs::{read_dir, DirEntry, OpenOptions};
-use std::io::{self, Read, Result};
+use std::io::{Read, Result, Stdin, Stdout, Write};
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
-pub fn read_file(path: &Path) -> io::Result<String> {
+pub fn read_file(path: &Path) -> Result<String> {
     let mut file = OpenOptions::new().read(true).open(path)?;
     let mut out = String::new();
     file.read_to_string(&mut out)?;
@@ -32,11 +33,16 @@ pub fn random_map(path: &Path) -> GameResult<PathBuf> {
 
 pub fn unknown_name() -> String {
     let id = Uuid::new_v4();
-    format!("unknown {}", id)
+    format!("unknown_{}", id)
 }
 
-pub fn map_name(path: PathBuf) -> String {
-    String::from(path.file_stem().unwrap().to_str().unwrap())
+pub fn map_name(path: &Path) -> GameResult<String> {
+    Ok(String::from(
+        path.file_stem()
+            .ok_or_else(|| GameError::NoMapFound(PathBuf::from(path)))?
+            .to_str()
+            .ok_or_else(|| GameError::Unexpected)?,
+    ))
 }
 
 pub fn clear() -> &'static str {
@@ -44,4 +50,13 @@ pub fn clear() -> &'static str {
      ####################\n\
      ##### CLI-MAZE #####\n\
      ####################\n\n"
+}
+
+pub fn ask_name(ask: &str, stdin: &Stdin, stdout: &mut Stdout) -> GameResult<String> {
+    let mut out = String::new();
+    print!("{}", ask);
+    stdout.flush()?;
+    stdin.read_line(&mut out)?;
+    let out = out.trim().to_owned().replace(' ', "_");
+    Ok(if out.is_empty() { unknown_name() } else { out })
 }

@@ -1,4 +1,5 @@
-use crate::game::handler::utils::{ask_name, disp_list};
+use crate::game::handler::utils::{disp_list, is_sure};
+use crate::utils::ask_name;
 use crate::{GameResult, MAPS_PATH};
 use std::fs::OpenOptions;
 use std::io::{Stdin, Stdout, Write};
@@ -27,8 +28,10 @@ fn create(name: String, raw: String) -> GameResult<()> {
 pub fn run(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
     disp_list()?;
     println!("--- Adding a map ---\n");
-    let name = ask_name("Enter the map name", stdin, stdout)?;
+    let name = ask_name("Enter the map name: ", stdin, stdout)?;
     let raw = get_raw(stdin)?;
-    create(name, raw)?;
+    if is_sure(format!("Adding a new map: {}", name), stdin, stdout)? {
+        create(name, raw)?;
+    }
     Ok(())
 }

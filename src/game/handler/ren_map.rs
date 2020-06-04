@@ -1,4 +1,5 @@
-use crate::game::handler::utils::{ask_map, ask_name, disp_list, is_sure};
+use crate::game::handler::utils::{ask_map, disp_list, is_sure};
+use crate::utils::{ask_name, map_name};
 use crate::{GameResult, MAPS_PATH};
 
 use std::fs::rename;
@@ -18,9 +19,16 @@ pub fn run(stdin: &Stdin, stdout: &mut Stdout) -> GameResult<()> {
         stdin,
         stdout,
     )?;
-    let to = rename_to(stdin, stdout)?;
+    let from_name = map_name(&map_path)?;
 
-    if is_sure(stdin, stdout)? {
+    let to = rename_to(stdin, stdout)?;
+    let to_name = map_name(&to)?;
+
+    if is_sure(
+        format!("Renaming map {} to {}", from_name, to_name),
+        stdin,
+        stdout,
+    )? {
         rename(map_path, to)?;
     }
 

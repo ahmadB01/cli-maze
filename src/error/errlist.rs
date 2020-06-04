@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 build_errs!(
     GameResult<Err=GameError>:
+    Unexpected => String::from("An unexpected error occured"),
     IncorrectInput => String::from("This input is incorrect"),
     TerminalError(e: ErrorKind) => format!("Unexpected terminal error: {}", e),
     IoError(path: Option<PathBuf>, e: Error) => {
